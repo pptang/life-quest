@@ -1,9 +1,11 @@
-import { createServiceClient } from "@/lib/supabase";
 import { NextRequest, NextResponse } from "next/server";
+import { createServiceClient } from "@/lib/supabase";
 
-export async function GET(request: NextRequest) {
+export const dynamic = "force-dynamic";
+
+export async function GET(req: NextRequest) {
   const supabase = createServiceClient();
-  const year = request.nextUrl.searchParams.get("year") || new Date().getFullYear().toString();
+  const year = req.nextUrl.searchParams.get("year") || "2026";
 
   const { data, error } = await supabase
     .from("annual_themes")
@@ -12,12 +14,5 @@ export async function GET(request: NextRequest) {
     .order("sort_order");
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-
-  const themes = (data || []).map((theme) => ({
-    ...theme,
-    quest_count: theme.quests?.length || 0,
-    quests: undefined,
-  }));
-
-  return NextResponse.json(themes);
+  return NextResponse.json(data);
 }

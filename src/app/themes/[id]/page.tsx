@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Nav from "@/components/Nav";
-import StatusBadge from "@/components/StatusBadge";
+import QuestStatusToggle from "@/components/QuestStatusToggle";
+import AddQuestForm from "@/components/AddQuestForm";
 import { getThemeWithQuests } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
@@ -43,7 +44,6 @@ export default async function ThemeDetailPage({ params }: { params: Promise<{ id
                 )}
               </div>
             </div>
-            <StatusBadge status={theme.status} />
           </div>
         </div>
 
@@ -55,16 +55,12 @@ export default async function ThemeDetailPage({ params }: { params: Promise<{ id
             const doneTasks = tasks.filter((t: any) => t.status === "done").length;
 
             return (
-              <Link
+              <div
                 key={quest.id}
-                href={`/quests/${quest.id}`}
                 className="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4 hover:bg-[var(--bg-hover)] transition-colors"
               >
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-medium">{quest.title}</h3>
-                    <StatusBadge status={quest.status} />
-                  </div>
+                <Link href={`/quests/${quest.id}`} className="min-w-0 flex-1">
+                  <h3 className="font-medium">{quest.title}</h3>
                   {quest.description && (
                     <p className="text-sm text-[var(--text-muted)] mt-1 truncate">{quest.description}</p>
                   )}
@@ -73,17 +69,15 @@ export default async function ThemeDetailPage({ params }: { params: Promise<{ id
                     {tasks.length > 0 && <span>{doneTasks}/{tasks.length} tasks</span>}
                     {quest.target_date && <span>Due: {quest.target_date}</span>}
                   </div>
+                </Link>
+                <div className="ml-4 shrink-0">
+                  <QuestStatusToggle questId={quest.id} currentStatus={quest.status} />
                 </div>
-                <span className="text-[var(--text-muted)] ml-4 shrink-0">→</span>
-              </Link>
+              </div>
             );
           })}
 
-          {quests.length === 0 && (
-            <div className="text-center py-12 text-[var(--text-muted)]">
-              No quests yet. Add some to get started!
-            </div>
-          )}
+          <AddQuestForm themeId={id} />
         </div>
       </main>
     </>
